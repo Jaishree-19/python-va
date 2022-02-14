@@ -5,6 +5,8 @@ import beepy
 import googlesearch  #get urls
 import pywhatkit as pyw #search in google
 
+list1=[""]
+
 tts_obj = tts.init(driverName='sapi5')
 voices = tts_obj.getProperty('voices')
 tts_obj.setProperty('voice', voices[1].id)
@@ -48,14 +50,27 @@ def search_google(data):
 def search_youtube(data):
     data = data.replace("search for", "")
     data = data.replace("in youtube", "")
-    speak(f"Searching Youtube for {data} ")
+    speak(f"Searching Youtube for {data}")
     pyw.playonyt(data)
+
+def add_to(data,list1):
+    data = data.replace("add","")
+    data=data.replace("list","")
+    speak(f"Adding {data} to the list")
+    list1.append(data)
+
+def show_list(list_s):
+    speak("The items in the list are: ")
+    for i in list_s:
+        speak(i)
+        print(i)
 
 if __name__ == "__main__":
     speak("Greetings! How may I help you?")
     #while True:
     command = takecommand().lower()
     print(command)
+
 
     #for wikipedia
     if "wikipedia" in command:
@@ -66,6 +81,16 @@ if __name__ == "__main__":
 
     elif "youtube" in command:
         search_youtube(command)
+
+    elif "add to " and "list" in command:
+        add_to(command ,list1)
+
+    elif "show" and "list" in command:
+        show_list(list1)
+
+
+
+
 
 
 
