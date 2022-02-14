@@ -2,6 +2,8 @@ import pyttsx3 as tts
 import speech_recognition as sr
 import wikipedia as wiki
 import beepy
+import googlesearch  #get urls
+import pywhatkit as pyw #search in google
 
 tts_obj = tts.init(driverName='sapi5')
 voices = tts_obj.getProperty('voices')
@@ -18,7 +20,7 @@ def takecommand():
     with sr.Microphone() as source:
         listener.adjust_for_ambient_noise(source)
         print("Listening..")
-        beepy.beep(sound="ping")
+        #beepy.beep(sound="ping")
         audio = listener.listen(source)
     try:
         command = listener.recognize_google(audio)
@@ -28,12 +30,45 @@ def takecommand():
         takecommand()
     return command
 
-if __name__ == "__main__":
-    speak("Greetings ! What do you want to search for")
-    command = takecommand()
+def search_wiki(data):
     speak("Searching wikipedia....")
-    results= wiki.summary(command,sentences=4)
+    data = data.replace("in wikipedia", "")
+    data= data.replace("search for","")
+    results = wiki.summary(data, sentences=4)
     speak("According to wikipedia ")
     print(results)
     speak(results)
+
+def search_google(data):
+    data=data.replace("search for","")
+    data=data.replace("in google","")
+    speak(f"Searching Google for {data}")
+    pyw.search(data)
+
+def search_youtube(data):
+    data = data.replace("search for", "")
+    data = data.replace("in youtube", "")
+    speak(f"Searching Youtube for {data} ")
+    pyw.playonyt(data)
+
+if __name__ == "__main__":
+    speak("Greetings! How may I help you?")
+    #while True:
+    command = takecommand().lower()
+    print(command)
+
+    #for wikipedia
+    if "wikipedia" in command:
+        search_wiki(command)
+
+    elif "google" in command:
+        search_google(command)
+
+    elif "youtube" in command:
+        search_youtube(command)
+
+
+
+
+
 
