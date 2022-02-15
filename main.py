@@ -4,8 +4,8 @@ import wikipedia as wiki
 import beepy
 import googlesearch  #get urls
 import pywhatkit as pyw #search in google
+import csv
 
-list1=[""]
 
 tts_obj = tts.init(driverName='sapi5')
 voices = tts_obj.getProperty('voices')
@@ -22,10 +22,11 @@ def takecommand():
     with sr.Microphone() as source:
         listener.adjust_for_ambient_noise(source)
         print("Listening..")
+        speak("listening")
         #beepy.beep(sound="ping")
         audio = listener.listen(source)
     try:
-        command = listener.recognize_google(audio)
+        command = listener.recognize_google(audio, language="en")
         print (f"you requested for:  {command}")
     except:
         speak("Sorry I could not understand what you said. Speak again ")
@@ -53,26 +54,36 @@ def search_youtube(data):
     speak(f"Searching Youtube for {data}")
     pyw.playonyt(data)
 
-def add_to(data,list1):
-    data = data.replace("add","")
-    data=data.replace("list","")
-    speak(f"Adding {data} to the list")
-    list1.append(data)
+def add_item_list(data):
+    data=data.replace("add","")
+    data=data.replace("to the list","")
 
-def show_list(list_s):
+
+def add_to(data):
+    data = data.replace("add","")
+    data=data.replace("to the list","")
+    speak(f"Adding {data} to the list")
+    with open("list_s.csv","a") as file: # append mode
+        writer = csv.writer(file)
+        writer.writerow([data])
+        file.close()
+
+
+
+def show_list():
     speak("The items in the list are: ")
-    for i in list_s:
-        speak(i)
-        print(i)
+    with open("list_s.csv","r") as file:
+        reader= csv.reader(file)
+        for item in reader:
+            speak(item)
+            print(item)
+
 
 if __name__ == "__main__":
-    speak("Greetings! How may I help you?")
-    #while True:
+  speak("Greetings! How may I help you?")
+  while True:
     command = takecommand().lower()
-    print(command)
 
-
-    #for wikipedia
     if "wikipedia" in command:
         search_wiki(command)
 
@@ -82,11 +93,16 @@ if __name__ == "__main__":
     elif "youtube" in command:
         search_youtube(command)
 
-    elif "add to " and "list" in command:
-        add_to(command ,list1)
+    elif"list" in command:
+        if "add" in command:
+            add_to(command)
+        elif "show" in command:
+            show_list()
 
-    elif "show" and "list" in command:
-        show_list(list1)
+    elif "stop":
+        exit()
+
+
 
 
 
